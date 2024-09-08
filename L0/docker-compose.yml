@@ -1,0 +1,25 @@
+version: "3.9"
+services:
+  wb-db:
+    container_name: wb-db
+    image: postgres:16.2-alpine
+    environment:
+      POSTGRES_USER: "POSTGRES_DB"
+      POSTGRES_PASSWORD: "postgres"
+      POSTGRES_DB: "wbtech"
+      POSTGRES_HOST: "wb-db"
+      POSTGRES_PORT: "5432"
+    volumes:
+      - "./db/migrations/init.sql:/docker-entrypoint-initdb.d"
+      - "./db-data:/var/lib/postgresql/data"
+    ports:
+      - "5432:5432"
+    networks:
+      - postgres
+
+volumes:
+  db-data:
+
+networks:
+  postgres:
+    driver: bridge
