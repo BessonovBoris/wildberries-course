@@ -8,11 +8,13 @@ use tokio_postgres::{self, NoTls};
 use log::{log, Level};
 use serde_json::json;
 
+// Parameters, got from request
 #[derive(Debug, Deserialize, Serialize)]
 struct Params {
     uid: Option<String>,
 }
 
+// App configuration
 #[derive(Deserialize)]
 struct Config {
     #[serde(default = "db_default_user")]
@@ -35,6 +37,7 @@ impl Config {
     }
 }
 
+// Struct for working with database
 struct DataBasePostgres {
     db: tokio_postgres::Client,
 }
@@ -394,6 +397,7 @@ async fn main() {
         eprintln!("Can't parse .env: {}", err);
         std::process::exit(1);
     });
+    log!(Level::Info, ".env file loaded");
 
     run(config).await;
 }
