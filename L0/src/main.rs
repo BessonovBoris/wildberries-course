@@ -2,12 +2,7 @@ use std::sync::Arc;
 use dotenvy;
 use envy;
 use serde::{Deserialize, Serialize};
-use axum::{
-    response::{IntoResponse, Html},
-    routing::{get},
-    Router,
-    extract::{Query, State},
-};
+use axum::{response::{IntoResponse, Html, Json}, routing::{get}, Router, extract::{Query, State}};
 use tokio_postgres::{self, NoTls};
 use log::{log, Level};
 
@@ -35,6 +30,27 @@ impl Config {
 
 struct DataBasePostgres {
     db: tokio_postgres::Client,
+}
+
+impl DataBasePostgres {
+    async fn get_name_by_id(&self, id: i32) -> Result<String, String> {
+        let result_statement = self.db.query("SELECT name FROM Users WHERE id=$1", &[&id]).await;
+        let rows = match result_statement {
+            Ok(rows) => rows,
+            Err(err) => return Err(err.to_string()),
+        };
+
+        if rows.is_empty() {
+            return Err("No name found".to_string());
+        }
+
+        let name: String = match rows[0].try_get(0) {
+            Ok(name) => name,
+            Err(err) => return Err(err.to_string()),
+        };
+
+        Ok(name)
+    }
 }
 
 fn server_default_address() -> String {
@@ -115,10 +131,7 @@ async fn handler(
     State(data): State<Arc<DataBasePostgres>>,
     Query(params): Query<ApiParams>,
 ) -> impl IntoResponse {
-    let rows = data.db.query("SELECT name FROM Users WHERE id=$1", &[&params.id.unwrap_or(-1)])
-        .await.expect("Can't select main");
-    println!("{:?}", params);
-    let name: String = rows[0].get(0);
-    Html(format!("You search: {}\nName is: {}", params.id.unwrap_or(-1), name))
-}
+    let name = data.get_name_by_id(params.id.unwrap_or(-1)).await.unwrap_or_else(|err| err);
 
+    Json(ApiParams { id: Some(params.id.unwrap_or(-1)), name: Some(name) } )
+}
