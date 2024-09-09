@@ -13,3 +13,4 @@ tokio = { version = "1.40.0", features = ["rt", "rt-multi-thread", "macros"] }
 tokio-net = "0.0.0"
 tokio-postgres = "0.7.11"
 log = "0.4.22"
+httpc-test = "0.1.10"
