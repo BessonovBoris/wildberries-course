@@ -32,6 +32,7 @@ struct Config {
 }
 
 impl Config {
+    // make string for connecting to database
     fn get_url(&self) -> String {
         format!("postgres://{}:{}@{}:{}/{}", self.postgres_user, self.postgres_password, self.postgres_host, self.postgres_port, self.postgres_db)
     }
@@ -47,6 +48,7 @@ impl DataBasePostgres {
         let mut order_builder = Order::builder();
         order_builder.with_order_uid(uid.clone());
 
+        // get delivery fields
         let delivery_result_statement = self.db.query(
             "SELECT * FROM delivery
             WHERE order_uid=$1", &[&uid]
@@ -65,6 +67,7 @@ impl DataBasePostgres {
             return Err(format!("Order {} has more than one delivery", uid));
         }
 
+        // add delivery to order
         order_builder.with_delivery(Delivery {
             name: delivers[0].get("name"),
             phone: delivers[0].get("phone"),
@@ -75,6 +78,7 @@ impl DataBasePostgres {
             email: delivers[0].get("email"),
         });
 
+        // get payment fields
         let payment_result_statement = self.db.query(
             "SELECT * FROM payments
             WHERE transaction=$1", &[&uid]
@@ -93,6 +97,7 @@ impl DataBasePostgres {
             return Err(format!("Order {} has more than one delivery", uid));
         }
 
+        // add payment to order
         order_builder.with_payment(Payment {
             transaction: payments[0].get("transaction"),
             request_id: payments[0].get("request_id"),
@@ -106,6 +111,7 @@ impl DataBasePostgres {
             custom_fee: payments[0].get("custom_fee"),
         });
 
+        // get items fields
         let items_result_statement = self.db.query(
             "SELECT * FROM products
             WHERE order_uid=$1", &[&uid]
@@ -120,6 +126,7 @@ impl DataBasePostgres {
             return Err("No order found".to_string());
         }
 
+        // collect all items to vector
         let mut items_vec = Vec::new();
         for row in items {
             items_vec.push(Item {
@@ -139,6 +146,7 @@ impl DataBasePostgres {
 
         order_builder.with_item(items_vec);
 
+        // get order fields
         let order_result_statement = self.db.query(
             "SELECT * FROM orders
             WHERE order_uid=$1", &[&uid]
@@ -393,6 +401,7 @@ fn db_default_port() -> String {
 async fn main() {
     dotenvy::dotenv().expect("Can't read .env");
 
+    // read config from .env file
     let config = envy::from_env::<Config>().unwrap_or_else(|err| {
         eprintln!("Can't parse .env: {}", err);
         std::process::exit(1);
@@ -403,6 +412,7 @@ async fn main() {
 }
 
 async fn run(config: Config) {
+    // connect to database
     let (client, connection) = tokio_postgres::connect(&config.get_url(), NoTls)
         .await.unwrap_or_else(|err| {
         eprintln!("Can't connect to postgres: {}", err);
@@ -426,6 +436,7 @@ async fn run(config: Config) {
     log!(Level::Info, "Server starts at {}", config.address);
 }
 
+// make endpoints
 fn routes(client: tokio_postgres::Client) -> Router {
     let app_state = Arc::new(DataBasePostgres { db: client });
 
@@ -434,6 +445,7 @@ fn routes(client: tokio_postgres::Client) -> Router {
         .with_state(app_state)
 }
 
+// get endpoint
 async fn get_order_by_uid(
     State(data): State<Arc<DataBasePostgres>>,
     Query(params): Query<Params>,
