@@ -1,6 +1,7 @@
 use std::thread;
 use std::time::Duration;
 
+// function to emulate long work(access to database, etc.)
 fn expensive_work() {
     thread::sleep(Duration::from_secs(1));
 }
@@ -24,17 +25,19 @@ fn read_vector_capacity() -> Result<usize, String> {
 fn main() {
     let vector_len = read_vector_capacity().unwrap();
     let nums = Vec::from_iter(1..=vector_len);
-    let mut jobs = Vec::new();
+    let mut handles = Vec::new();  // JoinHandle vector to end tasks
 
     for i in nums {
-        jobs.push(thread::spawn(move || {
+        // start computing square in new thread
+        handles.push(thread::spawn(move || {
             println!("{}", i * i)
         }));
     }
 
     expensive_work();
 
-    for job in jobs {
-        job.join().unwrap();
+    // wait until all thread finish job
+    for handle in handles {
+        handle.join().unwrap();
     }
 }
