@@ -1,11 +1,13 @@
 use std::collections::HashSet;
 use std::hash::Hash;
 
+// use rust realisation
 fn intersection_v1<T: Clone>(a: HashSet<T>, b: HashSet<T>) -> HashSet<T>
 where T: Eq, T: Hash {
     a.intersection(&b).cloned().collect()
 }
 
+// my realisation
 fn intersection_v2<T>(a: HashSet<T>, b: HashSet<T>) -> HashSet<T>
 where T: Eq, T: Hash {
     let mut ans = HashSet::new();

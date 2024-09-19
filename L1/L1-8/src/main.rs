@@ -10,6 +10,7 @@ fn realisation_hashmap() {
     for i in 0..10 {
         let map = map.clone();
         handles.push(std::thread::spawn(move || {
+            // lock to safety insert and prevent data race
             map.lock().unwrap().insert(format!("Number-{i}"), i);
         }));
     }

@@ -1,5 +1,6 @@
 use std::hash::{DefaultHasher, Hash, Hasher};
 
+// my type HashSet
 struct Set {
     data: Vec<Vec<String>>,
 }
@@ -13,6 +14,7 @@ impl Set {
     }
 
     fn insert(&mut self, s: String) {
+        // check if value is already in set
         if self.contains(&s) {
             return;
         }
