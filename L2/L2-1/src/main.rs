@@ -10,7 +10,10 @@ impl Program {
     }
 
     fn with_file_name(file: String) -> Self {
+        // open file and read it to buffer
         let file = std::io::BufReader::new(std::fs::File::open(file).unwrap());
+
+        // read 'Ok' lines and collect them into Strings
         let s = file.lines().filter_map(|ok| ok.ok()).collect::<Vec<String>>();
 
         Program::new(s)
@@ -48,23 +51,23 @@ fn main() {
 
     let filename = args.last().unwrap().to_string();
     let program = Program::with_file_name(filename.clone());
-    let mut nums = Vec::new();
+    let mut output = Vec::new();
 
     for i in 1..args.len()-1 {
         if args[i].eq("-c") {
-            nums.push(program.char_count());
+            output.push(program.char_count());
         } else if args[i].eq("-l") {
-            nums.push(program.lines_count());
+            output.push(program.lines_count());
         } else if args[i].eq("-w") {
-            nums.push(program.word_count());
+            output.push(program.word_count());
         }
     }
 
     if args.len() == 2 {
-        nums.push(program.word_count());
+        output.push(program.word_count());
     }
 
-    for num in nums.iter() {
+    for num in output.iter() {
         print!("{} ", num);
     }
 
