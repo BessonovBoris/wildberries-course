@@ -23,8 +23,8 @@ fn test_regular() {
 
 #[test]
 fn test_escape() {
-    let input = "a\\1\\2".to_string();
-    let expect = "a12".to_string();
+    let input = "qwe\\4\\5".to_string();
+    let expect = "qwe45".to_string();
     let actual = unpacking(&input).unwrap();
 
     assert_eq!(expect, actual);
