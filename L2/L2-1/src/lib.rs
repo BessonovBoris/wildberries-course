@@ -2,6 +2,8 @@ use std::io::BufRead;
 
 pub struct Program {
     lines: Vec<String>,
+
+    // optional functions
     count_words: Option<fn(&Program) -> usize>,
     count_lines: Option<fn(&Program) -> usize>,
     count_chars: Option<fn(&Program) -> usize>,
@@ -58,6 +60,7 @@ impl Program {
         output
     }
 
+    // functions
     fn count_words(&self) -> usize {
         let mut ans = 0;
 

@@ -9,10 +9,12 @@ fn main() {
     let filename = args.last().unwrap().to_string();
     let mut program = Program::with_file_name(filename.clone());
 
+    // if there no args, count words
     if args.len() == 2 {
         program.add_count_words();
     }
 
+    // parse args, add functions
     for flag in args.iter().skip(1)  {
         if flag.eq("-c") {
             program.add_count_chars();
