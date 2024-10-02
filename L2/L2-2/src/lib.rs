@@ -3,6 +3,7 @@ pub fn unpacking(input: &String) -> Result<String, String> {
 
     let mut i = 0;
     while i < input.len() {
+        // check for escape symbol
         let mut escaped = false;
 
         if input.chars().nth(i).unwrap() == '\\' {
@@ -15,10 +16,12 @@ pub fn unpacking(input: &String) -> Result<String, String> {
         }
         let char = input.chars().nth(i).unwrap();
 
+        // if there are number without symbols or escape => wrong format
         if char.is_digit(10) && !escaped {
             return Err(String::from("wrong format"));
         }
 
+        // find number start\end indexes
         let mut j = i + 1;
         while j < input.len() {
             let char = input.chars().nth(j).unwrap();
