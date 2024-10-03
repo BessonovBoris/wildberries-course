@@ -1,3 +1,14 @@
+use L2_4::search_anagrams;
+
 fn main() {
-    println!("Hello, world!");
+    let dictionary = ["abv", "lb", "lyr", "LYR", "lla", "lll"];
+    let anagrams = search_anagrams(&dictionary);
+
+    for anagram in anagrams.iter() {
+        println!("{:?}", anagram);
+    }
+
+    dictionary.iter().for_each(|d| {
+        println!("{}", d);
+    })
 }
