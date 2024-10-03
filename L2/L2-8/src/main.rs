@@ -1,3 +1,6 @@
+use shell::Desktop;
+
 fn main() {
-    println!("Hello, world!");
+    let desktop = Desktop::new();
+    desktop.run();
 }
